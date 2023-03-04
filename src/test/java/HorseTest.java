@@ -2,9 +2,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentMatchers;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.w3c.dom.html.HTMLObjectElement;
 
+
+import java.lang.reflect.Field;
+import java.util.regex.Matcher;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -29,46 +34,85 @@ public class HorseTest {
     @Test
     @DisplayName("should return IllegalArgumentException if Horse gets negative speed value")
     public void horseSpeedAsNegative() {
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new Horse("someName", -0.1, 0));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> new Horse("someName", -0.1, 0));
         assertEquals("Speed cannot be negative.", exception.getMessage());
     }
 
     @Test
     @DisplayName("should return IllegalArgumentException if Horse gets negative speed value")
     public void horseDistanceAsNegative() {
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new Horse("someName", 0, -0.1));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> new Horse("someName", 0, -0.1));
         assertEquals("Distance cannot be negative.", exception.getMessage());
     }
 
     @Test
-    @DisplayName("should return Horse's name")
+    @DisplayName("getName() should return Horse's name")
     public void horseGetName() {
         String expected = "horse";
         Horse horse = new Horse(expected, 2, 2);
+//      using refcletion to get field "name" to know if constructor or getName is broken
+        String horseNameValue = null;
+        try {
+            Field name = Horse.class.getDeclaredField("name");
+            name.setAccessible(true);
+            horseNameValue = (String) name.get(horse);
+            name.setAccessible(false);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+//        checking constructor
+        assertEquals(expected, horseNameValue);
+
         String actual = horse.getName();
+//        checking method
         assertEquals(expected, actual);
     }
 
     @Test
-    @DisplayName("should return Horse's speed")
+    @DisplayName("getSpeed() should return Horse's speed")
     public void horseGetSpeed() {
         Double expected = 2d;
         Horse horse = new Horse("horse", expected, 2);
+        Double horseSpeedValue = null;
+        try {
+            Field speed = Horse.class.getDeclaredField("speed");
+            speed.setAccessible(true);
+            horseSpeedValue = (Double) speed.get(horse);
+            speed.setAccessible(false);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+//        checking constructor
+        assertEquals(expected, horseSpeedValue);
+
         Double actual = horse.getSpeed();
+        //        checking method
         assertEquals(expected, actual);
     }
 
     @Test
-    @DisplayName("should return Horse's distance")
+    @DisplayName("etDistance() should return Horse's distance")
     public void horseGetDistance() {
         Double expected = 2d;
         Horse horse = new Horse("horse", 2, expected);
+        Double horseDistanceValue = null;
+        try {
+            Field distance = Horse.class.getDeclaredField("distance");
+            distance.setAccessible(true);
+            horseDistanceValue = (Double) distance.get(horse);
+            distance.setAccessible(false);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+//        checking constructor
+        assertEquals(expected, horseDistanceValue);
         Double actual = horse.getDistance();
+        //        checking method
         assertEquals(expected, actual);
     }
 
     @Test
-    @DisplayName("should return 0 as Horse's distance ")
+    @DisplayName("getDistance() should return 0 as Horse's distance ")
     public void horseGetZeroDistance() {
         Double expected = 0d;
         Horse horse = new Horse("horse", 2);
@@ -80,9 +124,8 @@ public class HorseTest {
     @DisplayName("horse.move should use getRandomDouble(0.2,0.9)")
     public void horseMoveUsesGetRandomDouble() {
         try (MockedStatic<Horse> mockedStatic = Mockito.mockStatic(Horse.class)) {
-            Horse horse = new Horse("name", 1, 2);
-            horse.move();
-            System.out.println(horse.getDistance());
+            new Horse("name", 31, 32).move();
+//            mockedStatic.verify(() -> Horse.getRandomDouble(ArgumentMatchers.eq(0.2d), ArgumentMatchers.anyDouble()));
             mockedStatic.verify(() -> Horse.getRandomDouble(0.2, 0.9));
         }
     }

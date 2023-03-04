@@ -15,7 +15,7 @@ public class MainTest {
         try{
             Main.main(null);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 }

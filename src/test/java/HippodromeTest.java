@@ -32,26 +32,31 @@ public class HippodromeTest {
         for (int i = 0; i < 30; i++) {
             horses.add(new Horse(i + "", i));
         }
+
         Hippodrome hippodrome = new Hippodrome(horses);
+
         assertEquals(horses, hippodrome.getHorses());
-        for (int i = 0; i < horses.size(); i++) {
-            Horse expected = horses.get(i);
-            Horse actual = hippodrome.getHorses().get(i);
-            assertEquals(actual, expected);
-        }
+//        for (int i = 0; i < horses.size(); i++) {
+//            Horse expected = horses.get(i);
+//            Horse actual = hippodrome.getHorses().get(i);
+//            assertEquals(actual, expected);
+//        }
     }
 
     @Test
     @DisplayName("should call move() for every horse in hippodrome")
     public void hippodromeMove() {
-        Horse mockHorse = Mockito.mock(Horse.class);
         List<Horse> horses = new ArrayList<>();
         for (int i = 0; i < 50; i++) {
-            horses.add(mockHorse);
+            horses.add(Mockito.mock(Horse.class));
         }
+
         Hippodrome hippodrome = new Hippodrome(horses);
         hippodrome.move();
-        Mockito.verify(mockHorse,Mockito.times(50)).move();
+
+        hippodrome.getHorses().forEach(horse ->
+                Mockito.verify(horse,Mockito.times(1)).move()
+        );
     }
 
     @Test
@@ -61,9 +66,11 @@ public class HippodromeTest {
         for (int i = 0; i < 30; i++) {
             horses.add(new Horse(i + "", i, i));
         }
+
         Hippodrome hippodrome = new Hippodrome(horses);
         Horse expected = horses.get(horses.size() - 1);
         Horse actual = hippodrome.getWinner();
+
         assertEquals(actual, expected);
     }
 }
